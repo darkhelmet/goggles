@@ -10,12 +10,17 @@ const (
 )
 
 type Config struct {
-    Host               string
-    Port               int
-    Database           string
+    // The hostname or IP of the InfluxDB server
+    Host string
+    // The port to connect on (default: 8086)
+    Port int
+    // The database to use (default: goggles)
+    Database string
+    // The auth information
     Username, Password string
 }
 
+// Deals with required values and setting defaults
 func (c *Config) SetDefaultsAndVerify() error {
     if c.Host == "" {
         return errors.New("missing host")

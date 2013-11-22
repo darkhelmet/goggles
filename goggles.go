@@ -1,3 +1,4 @@
+// Server monitoring in Go
 package main
 
 import (

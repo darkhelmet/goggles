@@ -9,14 +9,18 @@ func init() {
     Register("DiskUsage", NewDiskUsage)
 }
 
+// Checks disk usage using df
 type DiskUsage struct {
-    Path, Binary string
+    Path string
+    // The path to the df binary (default: /bin/df)
+    Binary string
 }
 
 func (du *DiskUsage) Run() error {
     return nil
 }
 
+// Constructor for DiskUsage plugin
 func NewDiskUsage(p Params) (Plugin, error) {
     du := &DiskUsage{Binary: "/bin/df"}
 

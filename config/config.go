@@ -13,11 +13,15 @@ type Check struct {
 }
 
 type Config struct {
+    // The name of the machine.
     Hostname string
+    // The InfluxDB config
     InfluxDB influxdb.Config
-    Checks   []Check
+    // Which checks to perform
+    Checks []Check
 }
 
+// Load a configuration JSON file from disk
 func LoadFile(path string) (*Config, error) {
     file, err := os.Open(path)
     if err != nil {

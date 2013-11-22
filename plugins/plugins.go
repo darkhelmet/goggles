@@ -1,3 +1,4 @@
+// Where all the plugins and supporting functions live
 package plugins
 
 import (
@@ -17,6 +18,7 @@ type Plugin interface {
 
 type Params map[string]interface{}
 
+// Decode the params into a struct
 func (p Params) Decode(dst interface{}) error {
     v := reflect.ValueOf(dst)
     if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
@@ -42,24 +44,11 @@ func (p Params) Decode(dst interface{}) error {
     return nil
 }
 
-func (p Params) String(key string) (string, error) {
-    v, ok := p[key]
-    if !ok {
-        return "", ParamMissing
-    }
-
-    s, ok := v.(string)
-    if !ok {
-        return "", ParamWrongType
-    }
-
-    return s, nil
-}
-
 type Constructor func(Params) (Plugin, error)
 
 var registry = make(map[string]Constructor)
 
+// Register a plugin for use, panics if plugin already registered
 func Register(name string, c Constructor) {
     if _, ok := registry[name]; ok {
         panic(fmt.Errorf("%s is already registered", name))
@@ -67,6 +56,7 @@ func Register(name string, c Constructor) {
     registry[name] = c
 }
 
+// Builds a plugin from the registry given the name and params
 func Build(name string, m Params) (Plugin, error) {
     c, ok := registry[name]
     if ok {
