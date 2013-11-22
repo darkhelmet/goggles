@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/darkhelmet/goggles.png?branch=master)](https://travis-ci.org/darkhelmet/goggles)
-
 # goggles
+
+[![Build Status](https://travis-ci.org/darkhelmet/goggles.png?branch=master)](https://travis-ci.org/darkhelmet/goggles)
 
 Server monitoring with Go
 
