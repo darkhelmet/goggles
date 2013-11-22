@@ -1,0 +1,8 @@
+{
+    "Hostname": "atlas",
+    "InfluxDB": {
+        "Host": "localhost",
+        "Username": "brucewayne",
+        "Password": "batman"
+    }
+}
