@@ -5,11 +5,13 @@ import (
     "errors"
     "fmt"
     "github.com/darkhelmet/goggles/influxdb"
+    "github.com/darkhelmet/goggles/plugins"
     "os"
 )
 
 type Check struct {
     Plugin string
+    Params plugins.Params
 }
 
 type Config struct {

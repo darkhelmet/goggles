@@ -4,6 +4,7 @@ package plugins
 import (
     "errors"
     "fmt"
+    "github.com/darkhelmet/goggles/influxdb"
     "reflect"
 )
 
@@ -13,7 +14,7 @@ var (
 )
 
 type Plugin interface {
-    Run() error
+    Run(chan influxdb.P) error
 }
 
 type Params map[string]interface{}
