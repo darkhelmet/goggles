@@ -10,28 +10,6 @@ import (
     "time"
 )
 
-type P map[string]interface{}
-
-func (p P) String(key string) (string, error) {
-    v, ok := p[key]
-    if !ok {
-        return "", fmt.Errorf("influxdb: missing %s param", key)
-    }
-    s, ok := v.(string)
-    if !ok {
-        return "", fmt.Errorf("influxdb: expected %s to be a string, but was a %T", key, v)
-    }
-    return s, nil
-}
-
-func (p P) Delete(key string) {
-    delete(p, key)
-}
-
-func (p P) Set(key string, value interface{}) {
-    p[key] = value
-}
-
 type InfluxDB struct {
     Config
 }
@@ -78,7 +56,7 @@ func (i *InfluxDB) Report(reports <-chan interface{}) error {
     for report := range reports {
         p := report.(P)
 
-        name, err := p.String("name")
+        name, err := p.GetString("name")
         if err != nil {
             log.Println(err)
             continue
@@ -97,11 +75,11 @@ func (i *InfluxDB) Report(reports <-chan interface{}) error {
         }
 
         series.Append(p)
+        log.Printf("name=%s %s", name, p)
     }
 
     payload := make([]*Series, 0, len(data))
     for _, series := range data {
-        log.Printf("%v", series)
         payload = append(payload, series)
     }
     body, err := json.Marshal(payload)

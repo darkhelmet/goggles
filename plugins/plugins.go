@@ -5,7 +5,6 @@ import (
     "errors"
     "fmt"
     "github.com/darkhelmet/goggles/influxdb"
-    "reflect"
 )
 
 var (
@@ -15,34 +14,6 @@ var (
 
 type Plugin interface {
     Run(chan influxdb.P) error
-}
-
-type Params map[string]interface{}
-
-// Decode the params into a struct
-func (p Params) Decode(dst interface{}) error {
-    v := reflect.ValueOf(dst)
-    if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
-        return errors.New("dst must be a pointer to struct")
-    }
-    v = v.Elem()
-
-    for name, value := range p {
-        field := v.FieldByName(name)
-        if !field.CanSet() {
-            return fmt.Errorf("can't set %s", name)
-        }
-        ft := field.Type()
-        switch ft.Kind() {
-        case reflect.String:
-            s, ok := value.(string)
-            if !ok {
-                return fmt.Errorf("%T doesn't match expected type %s for %s", value, ft.String(), name)
-            }
-            field.SetString(s)
-        }
-    }
-    return nil
 }
 
 type Constructor func(Params) (Plugin, error)

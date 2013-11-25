@@ -4,7 +4,7 @@ import (
     "errors"
     "fmt"
     i "github.com/darkhelmet/goggles/influxdb"
-    . "github.com/darkhelmet/goggles/util"
+    "syscall"
 )
 
 func init() {
@@ -14,44 +14,38 @@ func init() {
 // Checks disk usage using df
 type DiskUsage struct {
     // The path to examine
-    Path string
-    // The name of or path to the df binary (default: df)
-    Binary string
+    Paths []string
 }
 
 func (du *DiskUsage) Run(points chan i.P) error {
-    data, err := Run(du.Binary, "-m", du.Path)
-    if err != nil {
-        return err
-    }
+    for _, path := range du.Paths {
+        var stat syscall.Statfs_t
+        if err := syscall.Statfs(path, &stat); err != nil {
+            return err
+        }
 
-    lines := Lines(data)
-    if len(lines) != 2 {
-        return fmt.Errorf("expected 2 lines, got %d", len(lines))
-    }
+        bsize := uint64(stat.Bsize)
+        available := bsize * stat.Bavail / 1024 / 1024
+        total := bsize * stat.Blocks / 1024 / 1024
+        used := total - available
+        percent := float64(used) / float64(total) * 100
 
-    var filesystem string
-    var blocks, used, available, percent uint
-    _, err = fmt.Sscanf(lines[1], "%s%d%d%d%d%%", &filesystem, &blocks, &used, &available, &percent)
-    if err != nil {
-        return fmt.Errorf("failed scanning: %s", err)
+        points <- i.P{"name": "DiskUsage", "path": path, "used": used, "available": available, "percent": percent, "total": total}
     }
-
-    points <- i.P{"name": "DiskUsage", "path": du.Path, "used": used, "available": available, "percent": percent}
     return nil
 }
 
 // Constructor for DiskUsage plugin
 func NewDiskUsage(p Params) (Plugin, error) {
-    du := &DiskUsage{Binary: "df"}
+    du := &DiskUsage{}
 
     err := p.Decode(du)
     if err != nil {
         return nil, fmt.Errorf("failed decoding params: %s", err)
     }
 
-    if du.Path == "" {
-        return nil, errors.New("DiskUsage requires a Path parameter")
+    if len(du.Paths) == 0 {
+        return nil, errors.New("DiskUsage requires at least one path to check, Paths is empty")
     }
 
     return du, nil

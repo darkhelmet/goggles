@@ -8,22 +8,22 @@ import (
 
 func TestDiskUsage(t *testing.T) {
     Convey("NewDiskUsage", t, func() {
-        Convey("requires a path", func() {
+        Convey("requires at least one path", func() {
             p, err := plugins.NewDiskUsage(plugins.Params{})
             So(p, ShouldBeNil)
-            So(err.Error(), ShouldEqual, "DiskUsage requires a Path parameter")
+            So(err.Error(), ShouldEqual, "DiskUsage requires at least one path to check, Paths is empty")
         })
 
-        Convey("requires a string path", func() {
-            p, err := plugins.NewDiskUsage(plugins.Params{"Path": 5})
+        Convey("requires strings for paths", func() {
+            p, err := plugins.NewDiskUsage(plugins.Params{"Paths": []int{5}})
             So(p, ShouldBeNil)
-            So(err.Error(), ShouldEqual, "failed decoding params: int doesn't match expected type string for Path")
+            So(err.Error(), ShouldEqual, "failed decoding params: []int doesn't match expected type []string for Paths")
         })
 
-        Convey("requires a string binary", func() {
-            p, err := plugins.NewDiskUsage(plugins.Params{"Path": "/", "Binary": 5})
-            So(p, ShouldBeNil)
-            So(err.Error(), ShouldEqual, "failed decoding params: int doesn't match expected type string for Binary")
+        Convey("properly decodes paths", func() {
+            p, err := plugins.NewDiskUsage(plugins.Params{"Paths": []string{"foo", "bar"}})
+            So(p, ShouldNotBeNil)
+            So(err, ShouldBeNil)
         })
     })
 }
