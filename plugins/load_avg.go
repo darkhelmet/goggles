@@ -25,7 +25,13 @@ func (la *LoadAvg) Run(points chan i.P) error {
     five /= float64(nCPUs)
     fifteen /= float64(nCPUs)
 
-    points <- i.P{"name": "LoadAvg", "one": one, "five": five, "fifteen": fifteen, "cpus": nCPUs}
+    points <- i.P{
+        "name":    "LoadAvg",
+        "one":     one,
+        "five":    five,
+        "fifteen": fifteen,
+        "cpus":    nCPUs,
+    }
 
     return nil
 }
