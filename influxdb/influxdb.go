@@ -12,6 +12,8 @@ import (
 
 type InfluxDB struct {
     Config
+    // The hostname to report with each metric
+    Hostname string
 }
 
 type Series struct {
@@ -64,6 +66,7 @@ func (i *InfluxDB) Report(reports <-chan interface{}) error {
 
         p.Delete("name")
         p.Set("time", time.Now().Unix())
+        p.Set("hostname", i.Hostname)
 
         series, ok := data[name]
         if !ok {

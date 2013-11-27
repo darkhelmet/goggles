@@ -58,7 +58,10 @@ func main() {
     }
     reports := goctopus.New(channels...).Run()
 
-    db := influxdb.InfluxDB{Config: config.InfluxDB}
+    db := influxdb.InfluxDB{
+        Config:   config.InfluxDB,
+        Hostname: config.Hostname,
+    }
     err := db.Report(reports)
     if err != nil {
         log.Printf("reporting failed: %s", err)
