@@ -11,7 +11,7 @@ func init() {
     Register("DiskUsage", NewDiskUsage)
 }
 
-// Checks disk usage using df
+// Checks disk usage
 type DiskUsage struct {
     // The path to examine
     Paths []string
@@ -30,7 +30,14 @@ func (du *DiskUsage) Run(points chan i.P) error {
         used := total - available
         percent := float64(used) / float64(total) * 100
 
-        points <- i.P{"name": "DiskUsage", "path": path, "used": used, "available": available, "percent": percent, "total": total}
+        points <- i.P{
+            "name":      "DiskUsage",
+            "path":      path,
+            "used":      used,
+            "available": available,
+            "percent":   percent,
+            "total":     total,
+        }
     }
     return nil
 }
